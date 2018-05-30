@@ -1,0 +1,26 @@
+{
+  "name": "cocktails-server",
+  "version": "0.1.0",
+  "description": "api-server",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jhlindell/Cocktails-server.git"
+  },
+  "author": "Jon Lindell",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jhlindell/Cocktails-server/issues"
+  },
+  "homepage": "https://github.com/jhlindell/Cocktails-server#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.4",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.3",
+    "nodemon": "^1.17.5"
+  }
+}
