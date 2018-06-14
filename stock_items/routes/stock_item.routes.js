@@ -1,6 +1,7 @@
 const stockItems = require('../controllers/mongoose.controller.js');
 
 module.exports = (app) => {
+  // Create and save a single Stock Item
   app.post('/api/stock_items', stockItems.create);
 
   // Retrieve all Stock Items
