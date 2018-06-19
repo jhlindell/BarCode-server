@@ -1,4 +1,4 @@
-const stockItems = require('../controllers/mongoose.controller.js');
+const stockItems = require('../controllers/mongoose.controller');
 
 module.exports = (app) => {
   // Create and save a single Stock Item
@@ -15,4 +15,10 @@ module.exports = (app) => {
 
   // Delete a Stock Items with siId
   app.delete('/api/stock_items/:siId', stockItems.delete);
+
+  // Seed database with a number of stockitems
+  app.get('/api/seed_stock_items/', stockItems.seed);
+
+  // empty database of stock items
+  app.get('/api/clear_stock_items/', stockItems.clear);
 };
