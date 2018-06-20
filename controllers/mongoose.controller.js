@@ -137,7 +137,7 @@ exports.seed = (req, res) => {
   const items = [];
   for (let i = 0; i < 200; i += 1) {
     const name = faker.commerce.productName();
-    const description = faker.commerce.productAdjective();
+    const description = faker.lorem.sentence();
     items.push({ name, description });
   }
   StockItem.insertMany(items)
