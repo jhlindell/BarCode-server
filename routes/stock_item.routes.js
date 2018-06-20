@@ -1,4 +1,4 @@
-const stockItems = require('../controllers/mongoose.controller');
+const stockItems = require('../controllers/stock_item.controller');
 
 module.exports = (app) => {
   // Create and save a single Stock Item

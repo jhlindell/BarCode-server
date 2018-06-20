@@ -26,9 +26,11 @@ exports.create = (req, res) => {
 
 // Retrieve and return all stock items from the database.
 exports.findAll = (req, res) => {
-  StockItem.find()
-    .then((items) => {
-      res.send(items);
+  const page = Number(req.query.page);
+  const limit = Number(req.query.limit);
+  StockItem.paginate({}, { page, limit })
+    .then((result) => {
+      res.send(result);
     }).catch((err) => {
       res.status(500).send({
         message: err.message || 'Some error occurred while retrieving items.',

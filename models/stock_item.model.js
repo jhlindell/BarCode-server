@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-lazarus');
 
 const StockItemSchema = mongoose.Schema({
   siId: Number,
@@ -15,5 +16,7 @@ const StockItemSchema = mongoose.Schema({
 }, {
   timestamps: true,
 });
+
+StockItemSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('StockItem', StockItemSchema);
