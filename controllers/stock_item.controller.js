@@ -1,5 +1,6 @@
 const StockItem = require('../models/stock_item.model');
 const faker = require('faker');
+
 // save a single stock item to the database
 exports.create = (req, res) => {
   const item = new StockItem({
