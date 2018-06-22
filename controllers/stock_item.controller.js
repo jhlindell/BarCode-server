@@ -101,7 +101,7 @@ exports.update = (req, res) => {
   });
 };
 
-// Delete a note with the specified siId in the request
+// Delete a stockitem with the specified siId in the request
 exports.delete = (req, res) => {
   StockItem.findByIdAndRemove(req.params.siId)
     .then((item) => {

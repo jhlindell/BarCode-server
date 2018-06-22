@@ -5,6 +5,6 @@ module.exports = {
       "node": true
     },
     "rules": {
-      "no-underscore-dangle": [2, { "allow": ["_id"] }],
+      "no-underscore-dangle": [2, { "allow": ["_id", "_message"] }],
     },
 };
