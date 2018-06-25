@@ -31,7 +31,7 @@ exports.create = (req, res) => {
 exports.findAll = (req, res) => {
   const page = Number(req.query.page);
   const limit = Number(req.query.limit);
-  Recipe.paginate({}, { page, limit })
+  Recipe.paginate({}, { page, limit, sort: { name: 1 } })
     .then((result) => {
       res.send(result);
     }).catch((err) => {
