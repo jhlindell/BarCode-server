@@ -13,9 +13,7 @@ const StockItemSchema = mongoose.Schema({
     minlength: [2, 'Description must be longer than 2 characters.'],
     required: [true, 'Description is required'],
   },
-}, {
-  timestamps: true,
-});
+}, { collation: { locale: 'en_US', strength: 1 }, timestamps: true });
 
 StockItemSchema.plugin(mongoosePaginate);
 

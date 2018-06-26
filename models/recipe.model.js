@@ -37,7 +37,7 @@ const RecipeSchema = mongoose.Schema({
     type: [Ingredient],
     validate: [ingredientCount, 'Need to have at least one ingredient'],
   },
-});
+}, { collation: { locale: 'en_US', strength: 1 }, timestamps: true });
 
 RecipeSchema.plugin(mongoosePaginate);
 

@@ -29,7 +29,14 @@ exports.create = (req, res) => {
 exports.findAll = (req, res) => {
   const page = Number(req.query.page);
   const limit = Number(req.query.limit);
-  StockItem.paginate({}, { page, limit, sort: { name: 1 } })
+  const query = {};
+  const options = {
+    page,
+    limit,
+    sort: { name: 1 },
+  };
+
+  StockItem.paginate(query, options)
     .then((result) => {
       res.send(result);
     }).catch((err) => {
