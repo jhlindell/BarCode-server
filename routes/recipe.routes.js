@@ -1,4 +1,5 @@
 const recipes = require('../controllers/recipe.controller');
+const faker = require('../controllers/faker');
 
 module.exports = (app) => {
   // Create and save a single Recipe
@@ -17,8 +18,8 @@ module.exports = (app) => {
   app.delete('/api/recipes/:rId', recipes.delete);
 
   // // Seed database with a number of recipes
-  app.get('/api/seed_recipes/', recipes.seed);
+  app.get('/api/seed_recipes/', faker.recipeSeed);
 
   // empty database of recipes
-  app.get('/api/clear_recipes/', recipes.clear);
+  app.get('/api/clear_recipes/', faker.recipeClear);
 };

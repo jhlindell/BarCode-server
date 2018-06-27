@@ -18,6 +18,10 @@ const Ingredient = mongoose.Schema({
     type: String,
     required: [true, 'Ingredient name is required'],
   },
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'StockItem',
+  },
 });
 
 const RecipeSchema = mongoose.Schema({

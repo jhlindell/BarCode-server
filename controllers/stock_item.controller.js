@@ -1,5 +1,4 @@
 const StockItem = require('../models/stock_item.model');
-const faker = require('faker');
 
 // save a single stock item to the database
 exports.create = (req, res) => {
@@ -137,23 +136,3 @@ exports.delete = (req, res) => {
     });
 };
 
-// Clear all stockitems from database
-exports.clear = (req, res) => {
-  StockItem.deleteMany({})
-    .then(() => res.send({ message: 'success in deleting stock items' }))
-    .catch((error) => {
-      res.send(error);
-    });
-};
-
-exports.seed = (req, res) => {
-  const items = [];
-  for (let i = 0; i < 200; i += 1) {
-    const name = faker.commerce.productName();
-    const description = faker.lorem.paragraph();
-    items.push({ name, description });
-  }
-  StockItem.insertMany(items)
-    .then(response => res.send(response))
-    .catch(error => res.send(error));
-};
