@@ -18,11 +18,11 @@ exports.recipeSeed = async (req, res) => {
     }
     // make ingredients
     const ingredients = [];
-    rando = Math.random() * 4;
+    rando = (Math.random() * 3) + 1;
     for (let k = 0; k < rando; k += 1) {
       const ingredient = stockItems[Math.floor(Math.random() * stockItems.length)];
       ingredients.push({
-        measure: Math.random() * 3,
+        measure: (Math.random() * 3).toFixed(2),
         unit: 'oz',
         name: ingredient.name,
         _id: ingredient._id,
