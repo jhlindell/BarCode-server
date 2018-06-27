@@ -30,6 +30,9 @@ exports.findAll = (req, res) => {
   const page = Number(req.query.page);
   const limit = Number(req.query.limit);
   const query = {};
+  if (req.query.search !== undefined) {
+    query.name = { $regex: req.query.search, $options: 'i' };
+  }
   const options = {
     page,
     limit,

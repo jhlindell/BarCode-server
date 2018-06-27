@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/jhlindell/Cocktails-server#readme",
   "dependencies": {
+    "@types/mongoose": "^5.0.18",
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",
     "dotenv": "^5.0.1",
