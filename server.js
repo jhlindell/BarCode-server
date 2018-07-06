@@ -1,16 +1,15 @@
-'use strict';
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
-const express = require('express')
-const app = express();
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const Port = process.env.PORT || 8000;
+const app = require('./app');
+const winston = require('winston');
 
-app.use(bodyParser.json());
-app.use(cors());
+const port = process.env.PORT || 8000;
+
+const logger = winston.createLogger({
+  transports: [
+    new winston.transports.Console(),
+    // new winston.transports.File({ filename: 'barcode.log' }),
+  ],
+});
 
 app.listen(port, () => {
-    console.log("Now listening on port " + port);
-  });
+  logger.info(`Now listening on port ${port}`);
+});
