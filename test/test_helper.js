@@ -18,10 +18,12 @@ before((done) => {
 });
 
 beforeEach((done) => {
-  const { stockitems, recipes } = mongoose.connection.collections;
+  const { stockitems, recipes, users } = mongoose.connection.collections;
   stockitems.drop(() => {
     recipes.drop(() => {
-      done();
+      users.drop(() => {
+        done();
+      });
     });
   });
 });
