@@ -3,7 +3,10 @@ const jwt = require('jwt-simple');
 
 function tokenForUser(user) {
   const timestamp = new Date().getTime();
-  return jwt.encode({ sub: user.id, iat: timestamp }, process.env.JWT_SECRET);
+  return jwt.encode({
+    id: user._id,
+    iat: timestamp,
+  }, process.env.JWT_SECRET);
 }
 
 exports.signin = (req, res) => {

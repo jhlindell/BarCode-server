@@ -18,7 +18,7 @@ const UserSchema = mongoose.Schema({
   },
 });
 
-UserSchema.pre('save', function (next) {
+UserSchema.pre('save', function preHandler(next) {
   const user = this;
   const salt = bcrypt.genSaltSync();
   bcrypt.hash(user.password, salt, (err, hash) => {
@@ -30,7 +30,7 @@ UserSchema.pre('save', function (next) {
   });
 });
 
-UserSchema.methods.comparePassword = function (candidatePassword, callback) {
+UserSchema.methods.comparePassword = function compareHandler(candidatePassword, callback) {
   bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
     if (err) {
       callback(err);
