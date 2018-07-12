@@ -1,5 +1,6 @@
 const User = require('../models/user.model');
 const jwt = require('jwt-simple');
+const { getNameFromToken } = require('../services/auth');
 
 function tokenForUser(user) {
   const timestamp = new Date().getTime();
@@ -51,4 +52,10 @@ exports.signup = (req, res, next) => {
       }
     });
   }
+};
+
+exports.username = (req, res) => {
+  const token = req.headers.authorization;
+  const name = getNameFromToken(token);
+  res.send(name);
 };
