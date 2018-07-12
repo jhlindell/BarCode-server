@@ -5,12 +5,13 @@ function tokenForUser(user) {
   const timestamp = new Date().getTime();
   return jwt.encode({
     id: user._id,
+    username: user.username,
     iat: timestamp,
   }, process.env.JWT_SECRET);
 }
 
 exports.signin = (req, res) => {
-  res.send({ token: tokenForUser(req.user) });
+  res.send({ token: tokenForUser(req.user), username: req.user.username });
 };
 
 exports.signup = (req, res, next) => {
@@ -42,7 +43,7 @@ exports.signup = (req, res, next) => {
                 next(error);
               } else {
                 // Respond to request indicating the user was created
-                res.json({ token: tokenForUser(user) });
+                res.json({ token: tokenForUser(user), username });
               }
             });
           }
