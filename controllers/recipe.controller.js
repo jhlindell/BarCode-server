@@ -1,141 +1,126 @@
 const Recipe = require('../models/recipe.model');
+const mongoose = require('mongoose');
 
 // Create and save a new recipe
-exports.create = (req, res) => {
+exports.create = (name, description, instructions, ingredients) => {
   const recipe = new Recipe({
-    name: req.body.name,
-    description: req.body.description,
-    instructions: req.body.instructions,
-    ingredients: req.body.ingredients,
+    name, description, instructions, ingredients,
   });
-
-  recipe.validate((err) => {
-    if (err) {
-      res.status(400).send(err._message);
-    } else {
-      recipe.save()
-        .then((data) => {
-          res.send(data);
-        })
-        .catch((error) => {
-          res.status(500).send({
-            message: error.message || 'Some error occurred while creating the Item.',
-          });
-        });
-    }
-  });
+  const error = recipe.validateSync();
+  if (error) {
+    throw error;
+  } else {
+    return recipe.save()
+      .then(data => data)
+      .catch((err) => {
+        throw err;
+      });
+  }
 };
 
 // Retrieve all recipes
-exports.findAll = (req, res) => {
-  const page = Number(req.query.page);
-  const limit = Number(req.query.limit);
+exports.findAll = (page, limit, search) => {
   const query = {};
-  if (req.query.search !== undefined) {
-    query.name = { $regex: req.query.search, $options: 'i' };
+  if (search !== undefined) {
+    query.name = { $regex: search, $options: 'i' };
   }
   const options = {
     page,
     limit,
     sort: { name: 1 },
   };
-  Recipe.paginate(query, options)
-    .then((result) => {
-      res.send(result);
-    }).catch((err) => {
-      res.status(500).send({
-        message: err.message || 'Some error occurred while retrieving items.',
+
+  return Recipe.paginate(query, options)
+    .then((response) => {
+      const result = Object.assign(response);
+      const cleanedResult = response.docs.map((item) => {
+        const cleanedItem = {
+          _id: item._id,
+          name: item.name,
+          description: item.description,
+          instructions: item.instructions,
+          ingredients: item.ingredients,
+        };
+        return cleanedItem;
       });
+      result.docs = cleanedResult;
+      return result;
+    }).catch((err) => {
+      throw err;
     });
 };
 
 // Find a single recipe with an id
-exports.findOne = (req, res) => {
-  Recipe.findById(req.params.rId)
+exports.findOne = (id) => {
+  let objectId;
+  try {
+    objectId = mongoose.Types.ObjectId(id);
+  } catch (err) {
+    throw err;
+  }
+  return Recipe.findById(objectId)
     .then((recipe) => {
-      if (!recipe) {
-        res.status(404).send({
-          message: `Recipe not found with id ${req.params.rId}`,
-        });
-      } else {
-        res.send(recipe);
+      if (recipe) {
+        return recipe;
       }
+      throw new Error(`Recipe not found with id: ${objectId}`);
     }).catch((err) => {
-      if (err.kind === 'ObjectId') {
-        res.status(404).send({
-          message: `Recipe not found with id ${req.params.rId}`,
-        });
-      } else {
-        res.status(500).send({
-          message: err.message || `Error retrieving Recipe with id ${req.params.rId}`,
-        });
-      }
+      throw err;
     });
 };
 
 // Update a stock item identified by the siId in the request
-exports.update = (req, res) => {
+exports.update = (name, description, instructions, ingredients, id) => {
   const recipe = new Recipe({
-    name: req.body.name,
-    description: req.body.description,
-    instructions: req.body.instructions,
-    ingredients: req.body.ingredients,
+    name,
+    description,
+    instructions,
+    ingredients,
   });
-  recipe.validate((err) => {
-    if (err) {
-      res.status(400).send(err._message);
-    } else {
-      Recipe.findByIdAndUpdate(req.params.rId, {
-        name: req.body.name,
-        description: req.body.description,
-        instructions: req.body.instructions,
-        ingredients: req.body.ingredients,
-      }, { new: true })
-        .then((result) => {
-          if (!result) {
-            res.status(404).send({
-              message: `Item not found with id ${req.params.rId}`,
-            });
-          } else {
-            res.send(result);
-          }
-        }).catch((error) => {
-          if (error.kind === 'ObjectId') {
-            res.status(404).send({
-              message: `Item not found with id ${req.params.rId}`,
-            });
-          } else {
-            res.status(500).send({
-              message: `Error updating item with id ${req.params.rId}`,
-            });
-          }
-        });
-    }
-  });
+  let objectId;
+  try {
+    objectId = mongoose.Types.ObjectId(id);
+  } catch (err) {
+    throw err;
+  }
+  const error = recipe.validateSync();
+  if (error) {
+    throw error;
+  } else {
+    return Recipe.findByIdAndUpdate(objectId, {
+      name,
+      description,
+      instructions,
+      ingredients,
+    }, { new: true })
+      .then((result) => {
+        if (result) {
+          return (result);
+        }
+        throw new Error(`Recipe not found with id: ${id}`);
+      }).catch((err) => {
+        throw err;
+      });
+  }
 };
 
 // Delete a recipe with the specified rId in the request
-exports.delete = (req, res) => {
-  Recipe.findByIdAndRemove(req.params.rId)
+exports.delete = (id) => {
+  let objectId;
+  try {
+    objectId = mongoose.Types.ObjectId(id);
+  } catch (err) {
+    throw err;
+  }
+  return Recipe.findByIdAndRemove(objectId)
     .then((recipe) => {
-      if (!recipe) {
-        res.status(404).send({
-          message: `Recipe not found with id ${req.params.rId}`,
-        });
-      } else {
-        res.send({ message: 'Recipe deleted successfully!' });
+      if (recipe) {
+        return recipe;
       }
+      throw new Error(`Recipe not found with id: ${objectId}`);
     })
     .catch((err) => {
-      if (err.kind === 'ObjectId' || err.name === 'NotFound') {
-        res.status(404).send({
-          message: `Recipe not found with id ${req.params.rId}`,
-        });
-      } else {
-        res.status(500).send({
-          message: `Could not delete recipe with id ${req.params.rId}`,
-        });
-      }
+      throw err;
     });
 };
 

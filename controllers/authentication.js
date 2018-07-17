@@ -11,51 +11,47 @@ function tokenForUser(user) {
   }, process.env.JWT_SECRET);
 }
 
-exports.signin = (req, res) => {
-  res.send({ token: tokenForUser(req.user), username: req.user.username });
+exports.signin = (user) => {
+  const userToken = tokenForUser(user);
+  return { token: userToken, username: user.username };
 };
 
-exports.signup = (req, res, next) => {
-  const { username, email, password } = req.body;
+exports.signup = async (username, email, password) => {
   if (!username || !email || !password) {
-    res.status(422).send({ error: 'You must provide a username, email and password' });
+    throw new Error('You must provide a username, email and password');
   } else {
-    // see if a user with the specified email address exists
-    User.findOne({ email }, (err, existingEmail) => {
-      if (err) {
-        next(err);
-      } else if (existingEmail) {
-        res.status(422).send({ error: 'email is in use' });
-      } else {
-        User.findOne({ username }, (err2, existingUsername) => {
-          if (err2) {
-            next(err2);
-          } else if (existingUsername) {
-            res.status(422).send({ error: 'username is in use' });
-          } else {
-          // if a user with email and username does NOT exist, create and save user record
-            const user = new User({
-              username,
-              email,
-              password,
-            });
-            user.save((error) => {
-              if (error) {
-                next(error);
-              } else {
-                // Respond to request indicating the user was created
-                res.json({ token: tokenForUser(user), username });
-              }
-            });
-          }
-        });
+    try {
+      const existingEmail = await User.findOne({ email });
+      if (existingEmail) {
+        throw new Error('email is in use');
       }
+    } catch (err) {
+      throw err;
+    }
+    try {
+      const existingUsername = await User.findOne({ username });
+      if (existingUsername) {
+        throw new Error('username is in use');
+      }
+    } catch (err) {
+      throw err;
+    }
+    const user = new User({
+      username,
+      email,
+      password,
     });
+    try {
+      await user.save();
+      const object = { token: tokenForUser(user), username };
+      return object;
+    } catch (err) {
+      throw err;
+    }
   }
 };
 
-exports.username = (req, res) => {
-  const token = req.headers.authorization;
+exports.username = (token) => {
   const name = getNameFromToken(token);
-  res.send(name);
+  return name;
 };

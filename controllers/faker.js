@@ -3,7 +3,7 @@ const Recipe = require('../models/recipe.model');
 const StockItem = require('../models/stock_item.model');
 
 // Seed recipes to collection
-exports.recipeSeed = async (req, res) => {
+exports.recipeSeed = async () => {
   const recipes = [];
   let rando = 0;
   const stockItems = await StockItem.find();
@@ -35,39 +35,47 @@ exports.recipeSeed = async (req, res) => {
       ingredients,
     });
   }
-  Recipe.insertMany(recipes)
-    .then(response => res.send(response))
-    .catch(error => res.send(error));
+  try {
+    const result = await Recipe.insertMany(recipes);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 };
 
 // Clear all recipes from database
-exports.recipeClear = (req, res) => {
-  Recipe.deleteMany({})
-    .then(() => res.send({ message: 'success in deleting recipes' }))
-    .catch((error) => {
-      res.send(error);
-    });
+exports.recipeClear = async () => {
+  try {
+    await Recipe.deleteMany({});
+    return 'success in deleting recipes';
+  } catch (err) {
+    return err.message;
+  }
 };
 
 // Seed items to stock item collection
-exports.stockItemSeed = (req, res) => {
+exports.stockItemSeed = async () => {
   const items = [];
   for (let i = 0; i < 200; i += 1) {
     const name = faker.commerce.productName();
     const description = faker.lorem.paragraph();
     items.push({ name, description });
   }
-  StockItem.insertMany(items)
-    .then(response => res.send(response))
-    .catch(error => res.send(error));
+  try {
+    const result = await StockItem.insertMany(items);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 };
 
 // Clear all stockitems from database
-exports.stockItemClear = (req, res) => {
-  StockItem.deleteMany({})
-    .then(() => res.send({ message: 'success in deleting stock items' }))
-    .catch((error) => {
-      res.send(error);
-    });
+exports.stockItemClear = async () => {
+  try {
+    await StockItem.deleteMany({});
+    return 'success in deleting stock items';
+  } catch (err) {
+    return err.message;
+  }
 };
 

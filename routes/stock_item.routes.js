@@ -104,8 +104,18 @@ module.exports = (app) => {
   });
 
   // Seed database with a number of stockitems
-  app.get('/api/seed_stock_items/', faker.stockItemSeed);
+  app.get('/api/seed_stock_items/', async (req, res) => {
+    try {
+      const items = await faker.stockItemSeed();
+      res.send(items);
+    } catch (err) {
+      res.status(500).send({ message: err.message });
+    }
+  });
 
   // empty database of stock items
-  app.get('/api/clear_stock_items/', faker.stockItemClear);
+  app.get('/api/clear_stock_items/', async (req, res) => {
+    const message = await faker.stockItemClear();
+    res.send({ message });
+  });
 };
