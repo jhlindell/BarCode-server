@@ -5,6 +5,14 @@ const { Schema } = mongoose;
 
 const StockItemSchema = Schema({
   stockId: Schema.Types.ObjectId,
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  updatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
   name: {
     type: String,
     minlength: [2, 'Name must be longer than 2 characters.'],

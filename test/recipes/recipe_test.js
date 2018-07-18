@@ -10,6 +10,9 @@ const logger = winston.createLogger({
   ],
 });
 
+const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjViNDUwNDRkMDNiNzI4MzQ1NjI0N2ZkYSIsInVzZXJuYW1lIjoiam9uIiwiaWF0IjoxNTMxODU0NzMwNTM2fQ.tlGo2vaBS5RHsd1F2Qu-piI7TBfriCxS0PSeRBtueQE';
+
+
 const kingstonNegroni = {
   name: 'Kingston Negroni',
   description: 'The best negroni variant!',
@@ -62,7 +65,7 @@ describe('Recipe controller', () => {
         { measure: '1.0', unit: 'oz', name: 'sweet vermouth' },
         { measure: '2.0', unit: 'dash', name: 'bitters' },
         { measure: '1.0', unit: 'piece', name: 'cherry' },
-      ]);
+      ], token);
     } catch (err) {
       logger.info(`${err}`);
     }
@@ -78,7 +81,7 @@ describe('Recipe controller', () => {
     try {
       await controller.create('Kingston Negroni', 'The best negroni variant!', [
         'Build in a glass with ice and stir',
-      ], []);
+      ], [], token);
     } catch (err) {
       assert(err.message === 'Recipe validation failed: ingredients: Need to have at least one ingredient');
     }
@@ -124,7 +127,7 @@ describe('Recipe controller', () => {
         { measure: '1.0', unit: 'oz', name: 'Campari' },
         { measure: '1.0', unit: 'oz', name: 'Sweet Vermouth' },
       ],
-      recipe._id,
+      recipe._id, token,
     );
     assert(updatedRecipe.description === 'Fit for Jah!');
   });
@@ -142,7 +145,7 @@ describe('Recipe controller', () => {
           { measure: '1.0', unit: 'oz', name: 'Campari' },
           { measure: '1.0', unit: 'oz', name: 'Sweet Vermouth' },
         ],
-        '5b4d187a7875a55ff35aed99',
+        '5b4d187a7875a55ff35aed99', token,
       );
     } catch (err) {
       assert(err.message === 'Recipe not found with id: 5b4d187a7875a55ff35aed99');

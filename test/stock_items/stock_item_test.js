@@ -10,12 +10,13 @@ const logger = winston.createLogger({
   ],
 });
 
+const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjViNDUwNDRkMDNiNzI4MzQ1NjI0N2ZkYSIsInVzZXJuYW1lIjoiam9uIiwiaWF0IjoxNTMxODU0NzMwNTM2fQ.tlGo2vaBS5RHsd1F2Qu-piI7TBfriCxS0PSeRBtueQE';
 const StockItem = mongoose.model('StockItem');
 
 describe('Stock Item controller', () => {
   it('POST to create should create a stock item', async () => {
     try {
-      await controller.create('Smith & Cross Rum', 'Da Funk Bomb');
+      await controller.create('Smith & Cross Rum', 'Da Funk Bomb', token);
     } catch (err) {
       logger.info(`${err}`);
     }
@@ -25,7 +26,7 @@ describe('Stock Item controller', () => {
 
   it('POST to create with incomplete object should return error message', async () => {
     try {
-      await controller.create('Smith & Cross Rum');
+      await controller.create('Smith & Cross Rum', null, token);
     } catch (err) {
       assert(err.name === 'ValidationError');
     }
@@ -62,7 +63,7 @@ describe('Stock Item controller', () => {
   it('PUT to /api/stock_items/:id can update a record', async () => {
     const stockItem = new StockItem({ name: 'Smith & Cross Rum', description: 'Da Funk Bomb' });
     await stockItem.save();
-    const updated = await controller.update('Smith & Cross Rum', "Jamaica's Finest!!!", stockItem._id);
+    const updated = await controller.update('Smith & Cross Rum', "Jamaica's Finest!!!", stockItem._id, token);
     assert(updated.description === "Jamaica's Finest!!!");
   });
 
@@ -70,7 +71,7 @@ describe('Stock Item controller', () => {
     const stockItem = new StockItem({ name: 'Smith & Cross Rum', description: 'Da Funk Bomb' });
     await stockItem.save();
     try {
-      await controller.update('Smith & Cross Rum', "Jamaica's Finest!!!", '5b46486532a4803fbcb78942');
+      await controller.update('Smith & Cross Rum', "Jamaica's Finest!!!", '5b46486532a4803fbcb78942', token);
     } catch (err) {
       assert(err.message === 'Item not found with id: 5b46486532a4803fbcb78942');
     }

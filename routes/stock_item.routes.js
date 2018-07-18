@@ -1,6 +1,4 @@
 const stockItems = require('../controllers/stock_item.controller');
-const faker = require('../controllers/faker');
-
 require('../services/passport');
 const passport = require('passport');
 
@@ -10,8 +8,9 @@ module.exports = (app) => {
   // Create and save a single Stock Item
   app.post('/api/stock_items', requireAuth, async (req, res) => {
     const { name, description } = req.body;
+    const token = req.headers.authorization;
     try {
-      const item = await stockItems.create(name, description);
+      const item = await stockItems.create(name, description, token);
       res.send(item);
     } catch (err) {
       if (err.name === 'ValidationError') {
@@ -62,8 +61,9 @@ module.exports = (app) => {
   app.put('/api/stock_items/:siId', requireAuth, async (req, res) => {
     const { name, description } = req.body;
     const id = req.params.siId;
+    const token = req.headers.authorization;
     try {
-      const item = await stockItems.update(name, description, id);
+      const item = await stockItems.update(name, description, id, token);
       res.send(item);
     } catch (err) {
       if (err.kind === 'ObjectId' || err.message === `Item not found with id ${id}`) {
@@ -101,21 +101,5 @@ module.exports = (app) => {
         });
       }
     }
-  });
-
-  // Seed database with a number of stockitems
-  app.get('/api/seed_stock_items/', async (req, res) => {
-    try {
-      const items = await faker.stockItemSeed();
-      res.send(items);
-    } catch (err) {
-      res.status(500).send({ message: err.message });
-    }
-  });
-
-  // empty database of stock items
-  app.get('/api/clear_stock_items/', async (req, res) => {
-    const message = await faker.stockItemClear();
-    res.send({ message });
   });
 };
