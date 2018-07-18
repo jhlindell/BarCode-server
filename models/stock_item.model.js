@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-lazarus');
 
-const StockItemSchema = mongoose.Schema({
-  siId: Number,
+const { Schema } = mongoose;
+
+const StockItemSchema = Schema({
+  stockId: Schema.Types.ObjectId,
   name: {
     type: String,
     minlength: [2, 'Name must be longer than 2 characters.'],

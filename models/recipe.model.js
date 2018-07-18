@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-lazarus');
 
+const { Schema } = mongoose;
+
 function ingredientCount(val) {
   return val.length >= 1;
 }
 
-const Ingredient = mongoose.Schema({
+const Ingredient = Schema({
   measure: {
     type: Number,
     required: [true, 'Ingredient measure is required'],
@@ -19,13 +21,13 @@ const Ingredient = mongoose.Schema({
     required: [true, 'Ingredient name is required'],
   },
   _id: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'StockItem',
   },
 });
 
-const RecipeSchema = mongoose.Schema({
-  recipeID: Number,
+const RecipeSchema = Schema({
+  recipeID: Schema.Types.ObjectId,
   name: {
     type: String,
     minlength: [2, 'Name must be longer than 2 characters.'],

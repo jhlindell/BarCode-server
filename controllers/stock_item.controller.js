@@ -1,36 +1,26 @@
 const StockItem = require('../models/stock_item.model');
+const mongoose = require('mongoose');
 
 // save a single stock item to the database
-exports.create = (req, res) => {
-  const item = new StockItem({
-    name: req.body.name,
-    description: req.body.description,
-  });
-
-  item.validate((err) => {
-    if (err) {
-      res.status(400).send({
-        message: 'stock item name or description cannot be empty',
+exports.create = (name, description) => {
+  const item = new StockItem({ name, description });
+  const error = item.validateSync();
+  if (error) {
+    throw error;
+  } else {
+    return item.save()
+      .then(data => data)
+      .catch((err) => {
+        throw err;
       });
-    } else {
-      item.save()
-        .then(data => res.send(data))
-        .catch((error) => {
-          res.status(500).send({
-            message: error.message || 'Some error occurred while creating the Item.',
-          });
-        });
-    }
-  });
+  }
 };
 
 // Retrieve and return all stock items from the database.
-exports.findAll = (req, res) => {
-  const page = Number(req.query.page);
-  const limit = Number(req.query.limit);
+exports.findAll = (page, limit, search) => {
   const query = {};
-  if (req.query.search !== undefined) {
-    query.name = { $regex: req.query.search, $options: 'i' };
+  if (search !== undefined) {
+    query.name = { $regex: search, $options: 'i' };
   }
   const options = {
     page,
@@ -38,101 +28,87 @@ exports.findAll = (req, res) => {
     sort: { name: 1 },
   };
 
-  StockItem.paginate(query, options)
-    .then((result) => {
-      res.send(result);
-    }).catch((err) => {
-      res.status(500).send({
-        message: err.message || 'Some error occurred while retrieving items.',
+  return StockItem.paginate(query, options)
+    .then((response) => {
+      const result = Object.assign(response);
+      const cleanedResult = response.docs.map((item) => {
+        const cleanedItem = {
+          _id: item._id,
+          name: item.name,
+          description: item.description,
+        };
+        return cleanedItem;
       });
+      result.docs = cleanedResult;
+      return result;
+    }).catch((err) => {
+      throw err;
     });
 };
 
 // Find a single stock item with a id
-exports.findOne = (req, res) => {
-  StockItem.findById(req.params.siId)
+exports.findOne = (id) => {
+  let objectId;
+  try {
+    objectId = mongoose.Types.ObjectId(id);
+  } catch (err) {
+    throw err;
+  }
+  return StockItem.findById(objectId)
     .then((item) => {
-      if (!item) {
-        res.status(404).send({
-          message: `Item not found with id ${req.params.siId}`,
-        });
-      } else {
-        res.send(item);
+      if (item) {
+        return item;
       }
+      throw new Error(`Item not found with id: ${id}`);
     }).catch((err) => {
-      if (err.kind === 'ObjectId') {
-        res.status(404).send({
-          message: `Item not found with id ${req.params.siId}`,
-        });
-      } else {
-        res.status(500).send({
-          message: err.message || `Error retrieving item with id ${req.params.siId}`,
-        });
-      }
+      throw err;
     });
 };
 
 // Update a stock item identified by the siId in the request
-exports.update = (req, res) => {
+exports.update = (name, description, id) => {
+  let objectId;
+  try {
+    objectId = mongoose.Types.ObjectId(id);
+  } catch (err) {
+    throw err;
+  }
   const item = new StockItem({
-    name: req.body.name,
-    description: req.body.description,
+    name,
+    description,
   });
-  item.validate((err) => {
-    if (err) {
-      res.status(400).send({
-        message: 'stock item name or description cannot be empty',
+  const error = item.validateSync();
+  if (error) {
+    throw error;
+  } else {
+    return StockItem.findByIdAndUpdate(objectId, { name, description }, { new: true })
+      .then((stockitem) => {
+        if (stockitem) {
+          return stockitem;
+        }
+        throw new Error(`Item not found with id: ${id}`);
+      }).catch((err) => {
+        throw err;
       });
-    } else {
-      StockItem.findByIdAndUpdate(req.params.siId, {
-        name: req.body.name,
-        description: req.body.description,
-      }, { new: true })
-        .then((stockitem) => {
-          if (!stockitem) {
-            res.status(404).send({
-              message: `Item not found with id ${req.params.siId}`,
-            });
-          } else {
-            res.send(stockitem);
-          }
-        }).catch((error) => {
-          if (error.kind === 'ObjectId') {
-            res.status(404).send({
-              message: `Item not found with id ${req.params.siId}`,
-            });
-          } else {
-            res.status(500).send({
-              message: `Error updating item with id ${req.params.siId}`,
-            });
-          }
-        });
-    }
-  });
+  }
 };
 
 // Delete a stockitem with the specified siId in the request
-exports.delete = (req, res) => {
-  StockItem.findByIdAndRemove(req.params.siId)
+exports.delete = (id) => {
+  let objectId;
+  try {
+    objectId = mongoose.Types.ObjectId(id);
+  } catch (err) {
+    throw err;
+  }
+  return StockItem.findByIdAndRemove(objectId)
     .then((item) => {
-      if (!item) {
-        res.status(404).send({
-          message: `Item not found with id ${req.params.siId}`,
-        });
-      } else {
-        res.send({ message: 'Item deleted successfully!' });
+      if (item) {
+        return item;
       }
+      throw new Error(`Item not found with id: ${id}`);
     })
     .catch((err) => {
-      if (err.kind === 'ObjectId' || err.name === 'NotFound') {
-        res.status(404).send({
-          message: `Item not found with id ${req.params.siId}`,
-        });
-      } else {
-        res.status(500).send({
-          message: `Could not delete item with id ${req.params.siId}`,
-        });
-      }
+      throw err;
     });
 };
-
