@@ -11,7 +11,7 @@ module.exports = (app) => {
   app.post('/api/stock_items', requireAuth, async (req, res) => {
     const { name, description } = req.body;
     try {
-      const item = stockItems.create(name, description);
+      const item = await stockItems.create(name, description);
       res.send(item);
     } catch (err) {
       if (err.name === 'ValidationError') {
