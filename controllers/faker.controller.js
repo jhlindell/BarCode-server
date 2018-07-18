@@ -48,7 +48,6 @@ exports.recipeSeed = async () => {
   let rando = 0;
   const stockItems = await StockItem.find();
   const userList = await User.find();
-  console.log(userList);
   for (let i = 0; i < 200; i += 1) {
     const name = faker.commerce.productName();
     const description = faker.lorem.paragraph();
@@ -140,9 +139,18 @@ exports.userClear = async () => {
 
 // Seed users into database
 exports.userSeed = async () => {
+  const results = [];
+  users.forEach(async (user) => {
+    const newUser = new User(user);
+    try {
+      results.push(newUser.save());
+    } catch (err) {
+      throw err;
+    }
+  });
   try {
-    const result = await User.insertMany(users);
-    return result;
+    const resolvedResults = await Promise.all(results);
+    return resolvedResults;
   } catch (err) {
     throw err;
   }
