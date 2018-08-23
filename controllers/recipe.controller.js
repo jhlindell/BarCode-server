@@ -1,10 +1,18 @@
 const Recipe = require('../models/recipe.model');
 const mongoose = require('mongoose');
+const { getIdFromToken } = require('../services/auth');
+
 
 // Create and save a new recipe
-exports.create = (name, description, instructions, ingredients) => {
+exports.create = (name, description, instructions, ingredients, token) => {
+  let userId;
+  try {
+    userId = getIdFromToken(token);
+  } catch (err) {
+    throw err;
+  }
   const recipe = new Recipe({
-    name, description, instructions, ingredients,
+    name, description, instructions, ingredients, createdBy: userId, updatedBy: userId,
   });
   const error = recipe.validateSync();
   if (error) {
@@ -61,7 +69,14 @@ exports.findOne = (id) => {
   return Recipe.findById(objectId)
     .then((recipe) => {
       if (recipe) {
-        return recipe;
+        const cleanedRecipe = {
+          _id: recipe._id,
+          name: recipe.name,
+          description: recipe.description,
+          instructions: recipe.instructions,
+          ingredients: recipe.ingredients,
+        };
+        return cleanedRecipe;
       }
       throw new Error(`Recipe not found with id: ${objectId}`);
     }).catch((err) => {
@@ -70,19 +85,28 @@ exports.findOne = (id) => {
 };
 
 // Update a stock item identified by the siId in the request
-exports.update = (name, description, instructions, ingredients, id) => {
-  const recipe = new Recipe({
-    name,
-    description,
-    instructions,
-    ingredients,
-  });
+exports.update = (name, description, instructions, ingredients, id, token) => {
+  // make sure that the recipe id supplied is a valid Mongoose ObjectId
   let objectId;
   try {
     objectId = mongoose.Types.ObjectId(id);
   } catch (err) {
     throw err;
   }
+
+  // get userId from the header token
+  let userId;
+  try {
+    userId = getIdFromToken(token);
+  } catch (err) {
+    throw err;
+  }
+  const recipe = new Recipe({
+    name,
+    description,
+    instructions,
+    ingredients,
+  });
   const error = recipe.validateSync();
   if (error) {
     throw error;
@@ -92,6 +116,7 @@ exports.update = (name, description, instructions, ingredients, id) => {
       description,
       instructions,
       ingredients,
+      updatedBy: userId,
     }, { new: true })
       .then((result) => {
         if (result) {

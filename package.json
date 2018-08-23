@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "NODE_ENV=test nodemon --exec 'mocha --recursive'",
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "debug": "NODE_ENV=test nodemon --inspect-brk server.js"
   },
   "repository": {
     "type": "git",

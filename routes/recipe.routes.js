@@ -1,11 +1,8 @@
 const recipes = require('../controllers/recipe.controller');
-const faker = require('../controllers/faker');
-
 require('../services/passport');
 const passport = require('passport');
 
 const requireAuth = passport.authenticate('jwt', { session: false });
-
 
 module.exports = (app) => {
   // Create and save a single Recipe
@@ -13,8 +10,9 @@ module.exports = (app) => {
     const {
       name, description, instructions, ingredients,
     } = req.body;
+    const token = req.headers.authorization;
     try {
-      const recipe = recipes.create(name, description, instructions, ingredients);
+      const recipe = recipes.create(name, description, instructions, ingredients, token);
       res.send(recipe);
     } catch (err) {
       if (err.name === 'ValidationError') {
@@ -67,8 +65,9 @@ module.exports = (app) => {
       name, description, instructions, ingredients,
     } = req.body;
     const id = req.params.rId;
+    const token = req.headers.authorization;
     try {
-      const recipe = await recipes.update(name, description, instructions, ingredients, id);
+      const recipe = await recipes.update(name, description, instructions, ingredients, id, token);
       res.send(recipe);
     } catch (err) {
       if (err.kind === 'ObjectId' || err.message === `Recipe not found with id ${id}`) {
@@ -106,21 +105,5 @@ module.exports = (app) => {
         });
       }
     }
-  });
-
-  // // Seed database with a number of recipes
-  app.get('/api/seed_recipes/', async (req, res) => {
-    try {
-      const list = await faker.recipeSeed();
-      res.send(list);
-    } catch (err) {
-      res.status(500).send({ message: err.message });
-    }
-  });
-
-  // empty database of recipes
-  app.get('/api/clear_recipes/', async (req, res) => {
-    const message = await faker.recipeClear();
-    res.send({ message });
   });
 };

@@ -1,12 +1,53 @@
 const faker = require('faker');
 const Recipe = require('../models/recipe.model');
 const StockItem = require('../models/stock_item.model');
+const User = require('../models/user.model');
+
+// array of users to seed database
+const users = [
+  {
+    username: 'Jon',
+    email: 'jon@foo.com',
+    password: 'word',
+  },
+  {
+    username: 'Dave',
+    email: 'dave@foo.com',
+    password: 'pword',
+  },
+  {
+    username: 'Bob',
+    email: 'bob@foo.com',
+    password: 'password',
+  },
+  {
+    username: 'Steve',
+    email: 'steve@foo.com',
+    password: 'w3rd',
+  },
+  {
+    username: 'Jeph',
+    email: 'jeph@foo.com',
+    password: 'w0rd',
+  },
+  {
+    username: 'Sally',
+    email: 'sally@foo.com',
+    password: 'passw0rd',
+  },
+  {
+    username: 'Betty',
+    email: 'betty@foo.com',
+    password: 'passw0rd',
+  },
+];
 
 // Seed recipes to collection
 exports.recipeSeed = async () => {
   const recipes = [];
   let rando = 0;
   const stockItems = await StockItem.find();
+  const userList = await User.find();
   for (let i = 0; i < 200; i += 1) {
     const name = faker.commerce.productName();
     const description = faker.lorem.paragraph();
@@ -28,11 +69,14 @@ exports.recipeSeed = async () => {
         _id: ingredient._id,
       });
     }
+    rando = Math.floor(Math.random() * 7);
+    const createdBy = userList[rando]._id;
     recipes.push({
       name,
       description,
       instructions,
       ingredients,
+      createdBy,
     });
   }
   try {
@@ -56,10 +100,14 @@ exports.recipeClear = async () => {
 // Seed items to stock item collection
 exports.stockItemSeed = async () => {
   const items = [];
+  const userList = await User.find();
+  let rando;
   for (let i = 0; i < 200; i += 1) {
+    rando = Math.floor(Math.random() * 7);
+    const createdBy = userList[rando]._id;
     const name = faker.commerce.productName();
     const description = faker.lorem.paragraph();
-    items.push({ name, description });
+    items.push({ name, description, createdBy });
   }
   try {
     const result = await StockItem.insertMany(items);
@@ -79,3 +127,31 @@ exports.stockItemClear = async () => {
   }
 };
 
+// Clear all users from database
+exports.userClear = async () => {
+  try {
+    await User.deleteMany({});
+    return 'success in deleting users';
+  } catch (err) {
+    return err.message;
+  }
+};
+
+// Seed users into database
+exports.userSeed = async () => {
+  const results = [];
+  users.forEach(async (user) => {
+    const newUser = new User(user);
+    try {
+      results.push(newUser.save());
+    } catch (err) {
+      throw err;
+    }
+  });
+  try {
+    const resolvedResults = await Promise.all(results);
+    return resolvedResults;
+  } catch (err) {
+    throw err;
+  }
+};

@@ -3,7 +3,7 @@ const request = require('supertest');
 const app = require('../../app');
 const mongoose = require('mongoose');
 const winston = require('winston');
-const controller = require('../../controllers/authentication');
+const controller = require('../../controllers/auth.controller');
 
 const logger = winston.createLogger({
   transports: [
