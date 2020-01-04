@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const winston = require('winston');
 const router = require('./router');
-const dbConfig = require('./config/database.config.js');
+// const dbConfig = require('./config/database.config.js');
 const mongoose = require('mongoose');
 
 const logger = winston.createLogger({
@@ -22,10 +22,16 @@ app.use(bodyParser.json());
 mongoose.Promise = global.Promise;
 
 if (process.env.NODE_ENV !== 'test') {
-  mongoose.connect(dbConfig.url)
+  mongoose
+    .connect(process.env.DB_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+    })
     .then(() => {
       logger.info('Successfully connected to the database');
-    }).catch((err) => {
+    })
+    .catch((err) => {
       logger.info(`Could not connect to the database. Exiting now... ${err}`);
       process.exit();
     });
@@ -34,4 +40,3 @@ if (process.env.NODE_ENV !== 'test') {
 router(app);
 
 module.exports = app;
-
