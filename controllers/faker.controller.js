@@ -6,37 +6,37 @@ const User = require('../models/user.model');
 // array of users to seed database
 const users = [
   {
-    username: 'Jon',
+    username: 'jon',
     email: 'jon@foo.com',
     password: 'word',
   },
   {
-    username: 'Dave',
+    username: 'dave',
     email: 'dave@foo.com',
     password: 'pword',
   },
   {
-    username: 'Bob',
+    username: 'bob',
     email: 'bob@foo.com',
     password: 'password',
   },
   {
-    username: 'Steve',
+    username: 'steve',
     email: 'steve@foo.com',
     password: 'w3rd',
   },
   {
-    username: 'Jeph',
+    username: 'jeph',
     email: 'jeph@foo.com',
     password: 'w0rd',
   },
   {
-    username: 'Sally',
+    username: 'sally',
     email: 'sally@foo.com',
     password: 'passw0rd',
   },
   {
-    username: 'Betty',
+    username: 'betty',
     email: 'betty@foo.com',
     password: 'passw0rd',
   },

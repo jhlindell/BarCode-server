@@ -7,6 +7,9 @@ const router = require('./router');
 // const dbConfig = require('./config/database.config.js');
 const mongoose = require('mongoose');
 
+const remoteURL = process.env.DB_URL;
+// const mongoURL = dbConfig.url;
+
 const logger = winston.createLogger({
   transports: [
     new winston.transports.Console(),
@@ -23,7 +26,7 @@ mongoose.Promise = global.Promise;
 
 if (process.env.NODE_ENV !== 'test') {
   mongoose
-    .connect(process.env.DB_URL, {
+    .connect(remoteURL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
